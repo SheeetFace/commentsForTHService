@@ -12,23 +12,29 @@ export class CommentsController {
     return this.commentsService.createNewProject(createCommentDto);
   }
 
-  @Get()
-  findAll() {
-    return this.commentsService.findAll();
+  @Get('/get:projectID')
+  getAllCommentsByProjectID(@Param('projectID') projectID: string,) {
+    return this.commentsService.getAllCommentsByProjectID(projectID);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentsService.findOne(+id);
+
+  @Patch('/patch:projectID')
+  addComment(@Param('projectID') projectID: string, @Body() updateCommentDto: UpdateCommentDto) {
+    return this.commentsService.addComment(projectID, updateCommentDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentsService.update(+id, updateCommentDto);
+  @Delete('/removeCommentOne:projectID')
+  removeCommentByCommentID(@Param('projectID') projectID: string, @Body() commentID:{commnetID:string}) {
+    return this.commentsService.removeCommentByCommentID(projectID,commentID.commnetID);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentsService.remove(+id);
+  @Delete('/removeProject:projectID')
+  removeProject(@Param('projectID') projectID: string) {
+    return this.commentsService.removeProject(projectID);
+  }
+
+  @Get('/databaseSize')
+  async getDatabaseSize() {
+    return this.commentsService.getDatabaseSize();
   }
 }

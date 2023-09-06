@@ -22,19 +22,73 @@ export class CommentsService {
     return await this.categoryRepository.save(newProject);
   }
 
-  findAll() {
-    return `This action returns all comments`;
+  async getAllCommentsByProjectID(projectID:string) {
+    const strProjectID =projectID.replace(":", "")
+
+    const comments = await this.categoryRepository.findOne({where: {projectID: strProjectID}});
+    
+    return  comments
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
+
+  async addComment(projectID: string, updateCommentDto: UpdateCommentDto) {
+    const strProjectID =projectID.replace(":", "")
+
+    const projectComments = await this.categoryRepository.findOne({where: {projectID: strProjectID}});
+    if(!projectComments){
+        console.error(`comments with ${strProjectID} are not exists in func addComment`);
+    }
+    projectComments.comments.push(updateCommentDto)
+
+    await this.categoryRepository.save(projectComments)
+    return projectComments.comments;
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
+
+  async removeCommentByCommentID(projectID: string, commentID:string) {
+    const strProjectID =projectID.replace(":", "")
+
+    const projectComments = await this.categoryRepository.findOne({where: {projectID: strProjectID}});
+
+    if(!projectComments){
+        console.error(`comments with ${strProjectID} are not exists in func removeCommentByCommentID`);
+    }
+
+    projectComments.comments = projectComments.comments.filter(comment =>comment.commentID !== commentID)
+
+    await this.categoryRepository.save(projectComments)
+
+    return projectComments.comments;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async removeProject(projectID: string) {
+    const strProjectID =projectID.replace(":", "")
+
+    const projectData = await this.categoryRepository.findOne({
+      where: { projectID: strProjectID } 
+    });
+  
+    if (!projectData) {
+      console.error('projectID not found');
+    }
+  
+    await this.categoryRepository.delete({
+      projectID: strProjectID  
+    });
+
+    return `This project removed with ${strProjectID}`;
+  }
+
+
+  async getDatabaseSize(): Promise<{totalSize:string,usedSize:string}>{
+    const dbName = process.env.DB_NAME;
+
+    const [result] = await this.categoryRepository.query(
+      `SELECT   
+         pg_database_size($1) AS totalSize,
+         pg_size_pretty(pg_database_size(current_database())) AS usedSize`,  
+         [dbName]  
+    );
+    return result
   }
 }
