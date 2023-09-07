@@ -7,10 +7,16 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
+  @Get('/ping')
+  wakeUpServer() {
+    return this.commentsService.wakeUpServer();
+  }
+
   @Post()
   createNewProject(@Body() createCommentDto: CreateCommentDto) {
     return this.commentsService.createNewProject(createCommentDto);
   }
+
 
   @Get('/get:projectID')
   getAllCommentsByProjectID(@Param('projectID') projectID: string,) {

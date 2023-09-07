@@ -13,6 +13,9 @@ export class CommentsService {
     private readonly categoryRepository: Repository<Comment>
   ){}
 
+  async wakeUpServer(){
+    console.log('Ping sent to wake up server');
+  }
 
   async createNewProject(createCommentDto: CreateCommentDto) {
     const newProject = new Comment();
